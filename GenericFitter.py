@@ -43,6 +43,22 @@ class GenericFitter(object):
 #        self.w.pdf('model').fitTo(data)
 
 
+    def contour(self,var1,var2,n1=1,n2=2,n3=0,n4=0,n5=0):
+        self.w.factory('PROD::model('+','.join(self.pdfs)+')')
+        #create dataset
+        argset=ROOT.RooArgSet('set')
+        for obs in self.obs:
+            argset.add(self.w.var(obs))
+        data = ROOT.RooDataSet('data','data',argset)
+        data.add(argset)
+        data.Print()
+
+        nll = self.w.pdf('model').createNLL(data,ROOT.RooFit.Optimize(1),ROOT.RooFit.Offset(0))
+        minuit =ROOT.RooMinuit(nll)
+        return minuit.contour(self.w.var(var1),self.w.var(var2),n1,n2,n3,n4,n5)
+#        self.w.pdf('model').fitTo(data)
+
+
 
         
 
