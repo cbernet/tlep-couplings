@@ -185,7 +185,6 @@ class CouplingsFitter2(object):
         self.graph_couplings.SetMarkerStyle(20)
         self.graph_couplings.SetLineWidth(3)
         can_couplings = self.canvas('couplings')
-        can_couplings.cd()
         obj=[self.graph_couplings]
         self.graph_couplings.Draw("AP")
         self.graph_couplings.GetYaxis().SetTitle("68% CL on d(A) ")
@@ -221,7 +220,6 @@ class CouplingsFitter2(object):
             print poiLabel+':   ('+str(poi.getAsymErrorLo())+','+str(poi.getAsymErrorHi())+')'
 
         can_gamma = self.canvas('gamma')
-        can_gamma.cd()
         self.h_width.GetXaxis().SetTitle("#Gamma_{T}")
         self.h_width.GetYaxis().SetTitle("N toys")
         self.h_width.Draw()
@@ -230,8 +228,7 @@ class CouplingsFitter2(object):
         print 'Please check the histogram to see that the dist is Gaussian. If not the fit is biased'
         print 'The fit can be biased when floating the width sometimes.'
 
-#        return can_couplings, c2, can_gamma, obj
-
+        can_pulls = self.canvas('pulls')
         
 
 ##
