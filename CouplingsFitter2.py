@@ -39,25 +39,10 @@ class Constraint(object):
         self.var_sigma.Print()
         self.pdf_constraint.Print()
     
-    
-##class POI(object):
-##    def __init__(self, name, minimum, maximum, label=None):
-##        self.name = name
-##        self.pdf = ROOT.RooRealVar(name, name, 0, minimum, maximum)
-##        if not label:
-##            label = name
-##        self.label = label
-        
-
 class CouplingsFitter2(object):
     
     def __init__(self):
-##        self.poi = []
         self.poiLabels = []
-##        self.pdfs = []
-##        self.obs = []
-##        self.cyields = []
-##        self.cwidths = []
         self.BR = dict(
             b = 0.577, 
             tau = 0.063, 
@@ -73,6 +58,8 @@ class CouplingsFitter2(object):
         self.poi = dict()
         self.poilabels = dict()
         self.constraint = dict()
+        self.canvases = dict()
+        
         
     def addPOI(self,poi,label='',minimum =-0.3 ,maximum = 0.3):
         '''Add a parameter of interest,
@@ -134,20 +121,6 @@ class CouplingsFitter2(object):
         the fit varies W, thus moving the mean of the Gaussian.
         the value of the gaussian is then evaluated at WhObs.
         '''
-##        fcmd0 = 'expr::'+name+"('"+equation+"',"+dependents+')'
-##        self.w.factory(fcmd0)
-##        fcmd1 = name+'Obs['+str(number)+']'
-##        self.w.factory(fcmd1)
-##        self.obs.append(name+'Obs')
-##        fcmd2 = 'RooGaussian::'+name+'Constraint('+name+'Obs,'+name+','+str(error)+')'
-##        self.w.factory(fcmd2)
-##        print 'Add constraint', '*' * 50
-##        print fcmd0
-##        print fcmd1
-##        print fcmd2
-##        self.pdfs.append(name+'Constraint')
-##        self.cyields.append(name)
-##        self.cwidths.append(error)
         depnames = deplist.split(',')
         deps = []
         for dep in depnames:
@@ -156,37 +129,14 @@ class CouplingsFitter2(object):
             else:
                 deps.append(self.poi[dep])
         self.constraint[name] = Constraint(name, expr, deps, mean, sigma)
+    
         
     def info(self):
         for name, constraint in sorted(self.constraint.iteritems()):
             constraint.info()
-        
+    
 
-##    def addUniformConstraint(self,name,equation,dependents):
-##        self.w.factory('expr::'+name+"('"+equation+"',"+dependents+')')
-##        self.w.factory('RooUniform::'+name+'Constraint('+name+')')
-##        self.pdfs.append(name+'Constraint')
-##
-    
-    
     def fit(self):
-##        self.w.factory('PROD::model('+','.join(self.pdfs)+')')
-##        #create dataset
-##        argset=ROOT.RooArgSet('set')
-##        for obs in self.obs:
-##            argset.add(self.w.var(obs))
-##        self.data = ROOT.RooDataSet('data','data',argset)
-##        self.data.add(argset)
-##        self.data.Print()
-##        self.fitResult=self.w.pdf('model').fitTo(self.data,
-##                                                 ROOT.RooFit.PrintLevel(3),
-##                                                 ROOT.RooFit.Optimize(1),
-##                                                 ROOT.RooFit.Hesse(1),
-##                                                 ROOT.RooFit.Minos(1),
-##                                                 ROOT.RooFit.Strategy(2),
-##                                                 ROOT.RooFit.Save(1))
-##        #        self.w.pdf('model').fitTo(data)
-##
         pdfs = RooArgList()
         obsvars = RooArgSet('set')
         for constraint in self.constraint.values():
@@ -204,17 +154,22 @@ class CouplingsFitter2(object):
                                            ROOT.RooFit.Strategy(2),
                                            ROOT.RooFit.Save(1))        
 
+    def canvas(self, name):
+        canvas = self.canvases.setdefault(name, ROOT.TCanvas(name, name))
+        canvas.cd()
+        return canvas
+
     def createSummary(self):
         #sample the covariance matrix for the width
         ROOT.gStyle.SetOptTitle(0)
-        graph = ROOT.TGraphAsymmErrors(len(self.poi)+2)
+        self.graph_couplings = ROOT.TGraphAsymmErrors(len(self.poi)+2)
         
         order_BR = ['Z', 'W', 'b', 'c', 'g', 'tau', 'mu', 'gamma', 'inv']
 
         for i, poiname in enumerate(order_BR):
             poi = self.poi[poiname]
-            graph.SetPoint(i, i+0.5, poi.getVal())
-            graph.SetPointError(i, 0.0, 0.0, -poi.getAsymErrorLo(), poi.getAsymErrorHi())
+            self.graph_couplings.SetPoint(i, i+0.5, poi.getVal())
+            self.graph_couplings.SetPointError(i, 0.0, 0.0, -poi.getAsymErrorLo(), poi.getAsymErrorHi())
             
         print 'Sampling the covariance matrix to propagate error on width'
 
@@ -226,31 +181,28 @@ class CouplingsFitter2(object):
                 self.poi[randomizedPars.at(j).GetName()].setVal(randomizedPars.at(j).getVal())
             self.h_width.Fill(self.width.getVal())
             for cstr in self.constraint.values():
-                cstr.fill_pull()
-        histo = self.h_width
-        histo2 = self.constraint['Zh'].pulls
-        
-        graph.SetMarkerStyle(20)
-        graph.SetLineWidth(3)
-        c = ROOT.TCanvas('canvas','')
-        c.cd()
-        obj=[graph]
-        graph.Draw("AP")
-        graph.GetYaxis().SetTitle("68% CL on d(A) ")
-        graph.GetXaxis().SetNdivisions(0)
+                cstr.fill_pull()        
+        self.graph_couplings.SetMarkerStyle(20)
+        self.graph_couplings.SetLineWidth(3)
+        can_couplings = self.canvas('couplings')
+        can_couplings.cd()
+        obj=[self.graph_couplings]
+        self.graph_couplings.Draw("AP")
+        self.graph_couplings.GetYaxis().SetTitle("68% CL on d(A) ")
+        self.graph_couplings.GetXaxis().SetNdivisions(0)
         l=ROOT.TLine()
         l.SetLineColor(ROOT.kRed)
         l.SetLineWidth(3)
         l.DrawLine(0.0,0.0,len(self.poi)+1.5,0)
         obj.append(l)
 
-        graph.SetPoint(len(self.poi),len(self.poi)+0.5,0.0)
-        graph.SetPointError(len(self.poi),0.0,0.0,histo.GetRMS()/histo.GetMean(),
-                            histo.GetRMS()/histo.GetMean())
+        self.graph_couplings.SetPoint(len(self.poi),len(self.poi)+0.5,0.0)
+        self.graph_couplings.SetPointError(len(self.poi),0.0,0.0,self.h_width.GetRMS()/self.h_width.GetMean(),
+                            self.h_width.GetRMS()/self.h_width.GetMean())
 
         for i, poiname in enumerate(order_BR+['#Gamma_{T}']):
             label = self.poilabels.get(poiname, poiname)
-            obj.append(ROOT.TLatex(i+0.5,0.95*graph.GetYaxis().GetXmin(),label))
+            obj.append(ROOT.TLatex(i+0.5,0.95*self.graph_couplings.GetYaxis().GetXmin(),label))
             obj[-1].Draw()
 
         print """
@@ -268,22 +220,17 @@ class CouplingsFitter2(object):
             poiLabel = self.poilabels.get(name, name)
             print poiLabel+':   ('+str(poi.getAsymErrorLo())+','+str(poi.getAsymErrorHi())+')'
 
-        cprime = ROOT.TCanvas('canvas2','')
-        cprime.cd()
-        histo.GetXaxis().SetTitle("#Gamma_{T}")
-        histo.GetYaxis().SetTitle("N toys")
-        histo.Draw()
-        obj.append(histo)
-        print 'Relative error on the total width ',histo.GetRMS()/histo.GetMean()
+        can_gamma = self.canvas('gamma')
+        can_gamma.cd()
+        self.h_width.GetXaxis().SetTitle("#Gamma_{T}")
+        self.h_width.GetYaxis().SetTitle("N toys")
+        self.h_width.Draw()
+        obj.append(self.h_width)
+        print 'Relative error on the total width ',self.h_width.GetRMS()/self.h_width.GetMean()
         print 'Please check the histogram to see that the dist is Gaussian. If not the fit is biased'
         print 'The fit can be biased when floating the width sometimes.'
-        
-        c2 =  ROOT.TCanvas('canvas3','')
-        c2.cd()
-        histo2.Draw()
-        obj.append(histo2)
 
-        return c, c2, cprime, obj
+#        return can_couplings, c2, can_gamma, obj
 
         
 

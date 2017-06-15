@@ -50,9 +50,6 @@ print
 
 ################################################
 f.fit()
-c, c2, cprime,obj = f.createSummary()
-c.Draw()
-cprime.Draw()
-c2.Draw()
+f.createSummary()
 
-##f.w.Print()
+
