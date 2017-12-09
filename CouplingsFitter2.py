@@ -123,7 +123,7 @@ class CouplingsFitter2(object):
         expr = '+'.join(pwidths)
         if 'inv' in self.poi:
             # ? 
-            expr='('+expr+')/(1.0-inv*inv)'
+            expr='('+expr+')/(1.0-inv)'
         else:
             # setting invisible width to 0.
             expr='('+expr+')'
