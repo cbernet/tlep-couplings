@@ -91,15 +91,15 @@ class CouplingsFitter2(object):
         
         
     def addPOI(self,poi,label='',minimum =-0.3 ,maximum = 0.3):
-        '''Add a parameter of interest,
+        '''Add a parameter of interest.
 
         Example:
         
         addPOI('Z','Z',-0.05,0.05)
         ->
         Z[0,-0.05,0.05]
-        # adds variable gZ with value 0,
-        # allow it to scale between 0.95 and 1.05      
+        # adds variable Z with value 0,
+        # allow it to scale between -0.05 and 0.05
         '''
         self.poi[poi] = ROOT.RooRealVar(poi, poi, 0, minimum, maximum)
         if label == '':
@@ -107,27 +107,28 @@ class CouplingsFitter2(object):
         self.poilabels[poi] = label
 
     def createWidthDeviation(self):
-        '''Compute the width according to the specified coupling scaling factors. 
+        '''Compute the width deviation (denoted \kappa_H^2 by M.Peskin in arxiv 1312.4974).
+        
+        Note that we fit an additive modification of the coupling: (1 + dx)
+        is therefore equal to kappa_x
         '''
         expr='0'
         sumBR = sum(self.BR.values())
         pwidths = []
-        for coupling,br in self.BR.iteritems():
+        for dcoupling,br in self.BR.iteritems():
             pwidth = None
-            if coupling in self.poi:
-                pwidth = str(br/sumBR) + "*(1+"+coupling+")*(1+"+coupling+")"
+            if dcoupling in self.poi:
+                pwidth = str(br/sumBR) + "*(1+"+dcoupling+")*(1+"+dcoupling+")"
             else:
                 # using sm partial width
                 pwidth = str(br/sumBR)
             pwidths.append(pwidth)
         expr = '+'.join(pwidths)
         if 'inv' in self.poi:
-            # ? 
             expr='('+expr+')/(1.0-inv)'
         else:
             # setting invisible width to 0.
-            expr='('+expr+')'
-            
+            expr='('+expr+')'            
         dependentlist = RooArgList()    
         for dep in self.poi.values():
             dependentlist.add(dep)            
@@ -137,18 +138,20 @@ class CouplingsFitter2(object):
     def addConstraint(self, name, expr, deplist, mean, sigma):
         '''Add a constraint on one of the observables
         
-        For example, for WH inclusive: 
+        For example, for ZH inclusive: 
         
-        expr::Wh('(1+W)*(1+W)',W)
-        #W is kW. the WH yield depends quadratically on kW
-        #Wh is a pdf on W
-        WhObs[1]
-        #create a variable: observed Wh scaling factor w/r standard model, with value 1.
-        RooGaussian::WhConstraint(WhObs,Wh,0.004)
-        #create a Gaussian on variable WhObs, mean Wh, sigma 0.004
+        f.addConstraint('Zh','(1+Z)*(1+Z)','Z',1,0.004)  
+
+        Z is an additive modification of the gZ coupling w/r to the standard model,
+        so 1+Z = \kappa_Z
         
-        the fit varies W, thus moving the mean of the Gaussian.
-        the value of the gaussian is then evaluated at WhObs.
+        Zh is the pdf of the ratio of the yield w/r to the one expected in the standard model.
+        This pdf depends on Z, as (1+Z)*(1+Z).
+        
+        ZhObs is the measured value, here 1 so we assume that the SM yield is observed.
+        
+        The fit varies the parameter of interest Z, thus modifying the pdf,
+        while ZhObs is fixed at 1. The likelihood of each value of Z is evaluated at ZhObs on the pdf.
         '''
         deps = self._getdeps(deplist)
         self.constraint[name] = GaussianConstraint(name, expr, deps, mean, sigma)
@@ -169,6 +172,15 @@ class CouplingsFitter2(object):
     
 
     def addUniformConstraint(self,name, expr):
+        '''Adds a uniform constraint with pdf name, and expression expr.
+        
+        For example:
+        
+        f.addPOI('inv','inv', 0, 0.01)
+        f.addUniformConstraint('Zhinv','inv') ####->Means free floating
+
+        inv (the invisible BR) is free to float between 0 and 1%
+        '''
         deps = self._getdeps([expr])        
         self.constraint[name] = UniformConstraint(name, expr, deps)
 
