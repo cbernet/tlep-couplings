@@ -46,7 +46,7 @@ f.addConstraint('Zhtautau','(1+Z)*(1+Z)*(1+tau)*(1+tau)/width','Z,tau,width',1,0
 f.addConstraint('ZhZZ','(1+Z)*(1+Z)*(1+Z)*(1+Z)/width','Z,width',1,0.031*f350)
 f.addConstraint('Zhgammagamma','(1+Z)*(1+Z)*(1+gamma)*(1+gamma)/width','Z,gamma,width',1,0.03*f350)
 f.addConstraint('Zhmumu','(1+Z)*(1+Z)*(1+mu)*(1+mu)/width','Z,mu,width',1,0.13*f350)
-f.addConstraint('Zhinv','(1+Z)*(1+Z)*(inv)*(inv)/width','Z,inv,width', 0 , 0.003*f350)  
+f.addConstraint('Zhinv','(1+Z)*(1+Z)*(inv)','Z,inv,width', 0 , 0.003*f350)  
 # f.addUniformConstraint('Zhinv','inv') ####->Means free floating
 
 f.info()
