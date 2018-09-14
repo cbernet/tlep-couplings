@@ -18,9 +18,15 @@ a1 = 0.4 * y1
 
 f.addConstraint('y2','{}*(1+b)'.format(y2),
                 'b', y2, y2*.01)
-f.addConstraint('y1','({b1}*(1+b)/({b1}*(1+b)+{a1}*(1+a))*(1+b) + {a1}*(1+a)/({b1}*(1+b)+{a1}*(1+a))*(1+a))*{y1}'.format(b1=b1, a1=a1, y1=y1),
-                'b,a', y1, y1*.01)
+# f.addConstraint('y1','({b1}*(1+b)/({b1}*(1+b)+{a1}*(1+a))*(1+b) + {a1}*(1+a)/({b1}*(1+b)+{a1}*(1+a))*(1+a))*{y1}'.format(b1=b1, a1=a1, y1=y1),
+#                 'b,a', y1, y1*.01)
 
+f.addConstraint('y1','{b1}*(1+b) + {a1}*(1+a)'.format(b1=b1, a1=a1),
+                 'b,a', y1, y1*.01)
+
+#TODO
+# build more complex simple model
+# think about interface. formula will get complicated with width, etc. 
 
 f.info()
 
