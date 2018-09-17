@@ -33,7 +33,7 @@ f.createWidthDeviation()
 # the improvement on the 240 measurements based on ZH
 f350 = 0.95
 f.addChannel('Zh', 1., 0.004*f350, prod='Z')
-f.addChannel('Whbb240', 1., 0.022, prod='W', decay='b')
+f.addChannel('Whbb240', 1., 0.022, prod='W', decay=[('b', 1.)])
 f.addChannel('Whbb350', 1., 0.006, prod='W', decay='b')
 f.addChannel('Zhbb', 1., 0.002*f350, prod='Z', decay='b')
 f.addChannel('Zhcc', 1., 0.012*f350, prod='Z', decay='c')

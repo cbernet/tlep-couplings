@@ -179,12 +179,26 @@ class CouplingsFitter2(object):
         expr = expr_prod
         variables = [prod]
         if decay:
-            expr_decay = '(1+{decay})*(1+{decay})'.format(decay=decay)    
-            expr = '{expr_prod}*{expr_decay}/width'.format(
+            if isinstance(decay, basestring):
+                expr_decay = '(1+{decay})*(1+{decay})'.format(decay=decay)
+                variables.append(decay)
+            else:
+                decay_exprs = []
+                for decay, fraction in decay:
+                    n = mean * fraction
+                    decay_expr = '{n}*(1+{decay})*(1+{decay})'.format(
+                        n=n, 
+                        decay=decay
+                    )
+                    decay_exprs.append(decay_expr)
+                    variables.append(decay)
+                expr_decay = ' + '.join(decay_exprs)
+            expr = '{expr_prod}*({expr_decay})/width'.format(
                 expr_prod=expr_prod,
                 expr_decay=expr_decay,
             )
-            variables.extend([decay, 'width'])
+            variables.append('width')
+        variables = list(set(variables))
         deplist = ','.join(variables)
         self.addConstraint(name, expr, deplist, mean, sigma)
     
