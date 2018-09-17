@@ -8,18 +8,6 @@ class CouplingsFitterTest(object):
     
     def __init__(self):
         self.poiLabels = []
-##        self.BR = dict(
-##            b = 0.577, 
-##            tau = 0.063, 
-##            mu = 2.2e-4, 
-##            c = 2.91e-2, 
-##            g = 8.57e-2, 
-##            gamma = 3.82e-3, 
-##            W = 0.215, 
-##            Z = 0.0264, 
-##            t = 0.0
-##        )
-        
         self.poi = dict()
         self.poilabels = dict()
         self.constraint = dict()
@@ -42,35 +30,6 @@ class CouplingsFitterTest(object):
         if label == '':
             label = poi
         self.poilabels[poi] = label
-
-##    def createWidthDeviation(self):
-##        '''Compute the width deviation (denoted \kappa_H^2 by M.Peskin in arxiv 1312.4974).
-##        
-##        Note that we fit an additive modification of the coupling: (1 + dx)
-##        is therefore equal to kappa_x
-##        '''
-##        expr='0'
-##        sumBR = sum(self.BR.values())
-##        pwidths = []
-##        for dcoupling,br in self.BR.iteritems():
-##            pwidth = None
-##            if dcoupling in self.poi:
-##                pwidth = str(br/sumBR) + "*(1+"+dcoupling+")*(1+"+dcoupling+")"
-##            else:
-##                # using sm partial width
-##                pwidth = str(br/sumBR)
-##            pwidths.append(pwidth)
-##        expr = '+'.join(pwidths)
-##        if 'inv' in self.poi:
-##            expr='('+expr+')/(1.0-inv)'
-##        else:
-##            # setting invisible width to 0.
-##            expr='('+expr+')'            
-##        dependentlist = RooArgList()    
-##        for dep in self.poi.values():
-##            dependentlist.add(dep)            
-##        self.width = RooGenericPdf('width', 'width', expr, dependentlist)
-                
            
     def addConstraint(self, name, expr, deplist, mean, sigma):
         '''Add a constraint on one of the observables

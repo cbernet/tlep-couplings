@@ -1,6 +1,6 @@
-from CouplingsFitterTest import CouplingsFitterTest
+from CouplingsFitter2 import CouplingsFitter2
 
-f= CouplingsFitterTest()
+f= CouplingsFitter2()
 
 ###Here add the Parameters of interest with a reasonable range
 ##############################################################
@@ -32,19 +32,17 @@ f.createWidthDeviation()
 # mike added a factor of 0.95 which represents
 # the improvement on the 240 measurements based on ZH
 f350 = 0.95
-f.addConstraint('Zh','(1+Z)*(1+Z)','Z',1,0.004*f350)  
-# f.addConstraint('Wh','(1+W)*(1+W)','W',1,0.004)
-# f.addConstraint('Wh250','(1+W)*(1+W)','W',1,0.02)
-f.addConstraint('Whbb240','(1+W)*(1+W)*(1+b)*(1+b)/width','W,b,width',1,0.022)
-f.addConstraint('Whbb350','(1+W)*(1+W)*(1+b)*(1+b)/width','W,b,width',1,0.006)
-f.addConstraint('Zhbb','(1+Z)*(1+Z)*(1+b)*(1+b)/width','Z,b,width',1,0.002*f350)
-f.addConstraint('Zhcc','(1+Z)*(1+Z)*(1+c)*(1+c)/width','Z,c,width',1,0.012*f350)  
-f.addConstraint('Zhgg','(1+Z)*(1+Z)*(1+g)*(1+g)/width','Z,g,width',1,0.014*f350)
-f.addConstraint('ZhWW','(1+Z)*(1+Z)*(1+W)*(1+W)/width','Z,W,width',1,0.009*f350)
-f.addConstraint('Zhtautau','(1+Z)*(1+Z)*(1+tau)*(1+tau)/width','Z,tau,width',1,0.007*f350)
-f.addConstraint('ZhZZ','(1+Z)*(1+Z)*(1+Z)*(1+Z)/width','Z,width',1,0.031*f350)
-f.addConstraint('Zhgammagamma','(1+Z)*(1+Z)*(1+gamma)*(1+gamma)/width','Z,gamma,width',1,0.03*f350)
-f.addConstraint('Zhmumu','(1+Z)*(1+Z)*(1+mu)*(1+mu)/width','Z,mu,width',1,0.13*f350)
+f.addChannel('Zh', 1., 0.004*f350, prod='Z')
+f.addChannel('Whbb240', 1., 0.022, prod='W', decay='b')
+f.addChannel('Whbb350', 1., 0.006, prod='W', decay='b')
+f.addChannel('Zhbb', 1., 0.002*f350, prod='Z', decay='b')
+f.addChannel('Zhcc', 1., 0.012*f350, prod='Z', decay='c')
+f.addChannel('Zhgg', 1., 0.014*f350, prod='Z', decay='g')
+f.addChannel('ZhWW', 1., 0.009*f350, prod='Z', decay='W')
+f.addChannel('Zhtautau', 1., 0.007*f350, prod='Z', decay='tau')
+f.addChannel('ZhZZ', 1., 0.031*f350, prod='Z', decay='Z')
+f.addChannel('Zhgammagamma', 1., 0.03*f350, prod='Z', decay='gamma')
+f.addChannel('Zhmumu', 1., 0.13*f350, prod='Z', decay='mu')
 f.addUniformConstraint('Zhinv','inv') ####->Means free floating
 
 f.info()

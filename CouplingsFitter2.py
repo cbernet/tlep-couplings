@@ -153,6 +153,10 @@ class CouplingsFitter2(object):
         The fit varies the parameter of interest Z, thus modifying the pdf,
         while ZhObs is fixed at 1. The likelihood of each value of Z is evaluated at ZhObs on the pdf.
         '''
+        print 'constraint:', name
+        print expr
+        print deplist
+        print mean, '+/-', sigma
         deps = self._getdeps(deplist)
         self.constraint[name] = GaussianConstraint(name, expr, deps, mean, sigma)
 
@@ -169,8 +173,21 @@ class CouplingsFitter2(object):
             else:
                 deps.append(self.poi[dep])
         return deps
-    
 
+    def addChannel(self, name, mean, sigma, prod, decay=None):
+        expr_prod = '(1+{prod})*(1+{prod})'.format(prod=prod)
+        expr = expr_prod
+        variables = [prod]
+        if decay:
+            expr_decay = '(1+{decay})*(1+{decay})'.format(decay=decay)    
+            expr = '{expr_prod}*{expr_decay}/width'.format(
+                expr_prod=expr_prod,
+                expr_decay=expr_decay,
+            )
+            variables.extend([decay, 'width'])
+        deplist = ','.join(variables)
+        self.addConstraint(name, expr, deplist, mean, sigma)
+    
     def addUniformConstraint(self,name, expr):
         '''Adds a uniform constraint with pdf name, and expression expr.
         

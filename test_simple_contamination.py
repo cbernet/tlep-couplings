@@ -26,7 +26,8 @@ f.addConstraint('y1','{b1}*(1+b) + {a1}*(1+a)'.format(b1=b1, a1=a1),
 
 #TODO
 # build more complex simple model
-# think about interface. formula will get complicated with width, etc. 
+# think about interface. formula will get complicated with width, etc.
+# add nuisance parameter for systematic uncertainty on a1 and b1
 
 f.info()
 
