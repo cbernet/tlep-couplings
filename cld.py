@@ -10,17 +10,17 @@ float_width = True
 
 ###Here add the Parameters of interest with a reasonable range
 ##############################################################
-f.addPOI('Z','Z',-0.1,0.1)
-f.addPOI('W','W',-0.1,0.1)
-f.addPOI('b','b',-0.1,0.1)
-f.addPOI('c','c',-0.1,0.1)
+f.addPOI('Z','Z',-0.02,0.02)
+f.addPOI('W','W',-0.02,0.02)
+f.addPOI('b','b',-0.02,0.02)
+f.addPOI('c','c',-0.05,0.05)
 f.addPOI('g','g',-0.1,0.1)
-f.addPOI('tau','#tau',-0.1,0.1)
+f.addPOI('tau','#tau',-0.05,0.05)
 # f.addPOI('t','t',-1,1)
-f.addPOI('mu','#mu',-0.4,0.4)
+f.addPOI('mu','#mu',-0.3,0.3)
 f.addPOI('gamma','#gamma',-0.1, 0.1)
 if float_width:
-    f.addPOI('inv','inv', 0, 0.1)
+    f.addPOI('inv','inv', 0, 0.05)
 f.createWidthDeviation()    
 ##
 ##f.addPOI('Z','Z',-2, 2)
@@ -42,21 +42,32 @@ f.createWidthDeviation()
 lumi_factor = 1 / math.sqrt(lumi/base_lumi)
 # f.addConstraint('Zh','(1+Z)*(1+Z)','Z',1,0.0085*f350)
 f.addChannel('Zh', 1., 0.0085*f350*lumi_factor, prod='Z')
-f.addChannel('Zhbb', 1., 0.0079*f350*lumi_factor, prod='Z', decay='b')
+f.addChannel('Zhllbb', 1., 0.0079*f350*lumi_factor, prod='Z', decay='b')
+# account for small contamination in nunubb? + VBF
+# missing contamination for qqbb
+f.addChannel('Zhnunubb', 1., 0.0057*f350*lumi_factor, prod='Z', decay='b')
+f.addChannel('Zhqqbb', 1., 0.0046*f350*lumi_factor, prod='Z', decay='b')
 f.addChannel('ZhllWWhad', 1., 0.015*f350*lumi_factor, prod='Z',
              decay=[('W', 0.65),
                     ('g', 0.25),
                     ('Z', 0.1)]
              )
-f.addChannel('ZhllWW1lep', 1., 0.0182*f350*lumi_factor, prod='Z',
-             decay=[('W', 0.9),
-                    ('tau', 0.04),
-                    ('Z', 0.06)]
+f.addChannel('ZhllWW1lep', 1., 0.0179*f350*lumi_factor, prod='Z',
+             decay=[
+##                 ('W', 1.)
+                 ('W', 0.92),
+                 ('tau', 0.015),
+                 ('b', 0.015),
+                 ('Z', 0.05)
+             ]
              )
 f.addChannel('ZhqqWW2lep', 1., 0.0243*f350*lumi_factor, prod='Z',
-             decay=[('W', 0.9),
-                    ('tau', 0.07),
-                    ('b', 0.03)]
+             decay=[
+##                 ('W', 1)
+                 ('W', 0.9),
+                 ('tau', 0.07),
+                 ('b', 0.03)
+             ]
              )
 f.addChannel('ZhnunuWW', 1., 0.02*f350*lumi_factor, prod='Z',
              decay=[('W', 0.6),
