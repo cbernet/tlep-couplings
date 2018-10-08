@@ -4,7 +4,7 @@ from CouplingsFitter2 import CouplingsFitter2
 f= CouplingsFitter2()
 
 f350 = 0.95
-lumi = 10.
+lumi = 5.
 base_lumi = 5.
 float_width = True
 
@@ -44,17 +44,18 @@ lumi_factor = 1 / math.sqrt(lumi/base_lumi)
 f.addChannel('Zh', 1., 0.0085*f350*lumi_factor, prod='Z')
 f.addChannel('Zhllbb', 1., 0.0079*f350*lumi_factor, prod='Z', decay='b')
 # account for small contamination in nunubb? + VBF
-# missing contamination for qqbb
-f.addChannel('Zhnunubb', 1., 0.0057*f350*lumi_factor, prod='Z', decay='b')
+
+# will not be able to get the f350 factor for this channel due to the contamination from WWH
+# treating WWH as background
+f.addChannel('Zhnunubb', 1., 0.0081*lumi_factor, prod='Z', decay='b')
 f.addChannel('Zhqqbb', 1., 0.0046*f350*lumi_factor, prod='Z', decay='b')
-f.addChannel('ZhllWWhad', 1., 0.015*f350*lumi_factor, prod='Z',
+f.addChannel('ZhllWWhad', 1., 0.0151*f350*lumi_factor, prod='Z',
              decay=[('W', 0.65),
                     ('g', 0.25),
                     ('Z', 0.1)]
              )
-f.addChannel('ZhllWW1lep', 1., 0.0179*f350*lumi_factor, prod='Z',
+f.addChannel('ZhllWW1lep', 1., 0.0181*f350*lumi_factor, prod='Z',
              decay=[
-##                 ('W', 1.)
                  ('W', 0.92),
                  ('tau', 0.015),
                  ('b', 0.015),
@@ -63,7 +64,6 @@ f.addChannel('ZhllWW1lep', 1., 0.0179*f350*lumi_factor, prod='Z',
              )
 f.addChannel('ZhqqWW2lep', 1., 0.0243*f350*lumi_factor, prod='Z',
              decay=[
-##                 ('W', 1)
                  ('W', 0.9),
                  ('tau', 0.07),
                  ('b', 0.03)
@@ -75,10 +75,10 @@ f.addChannel('ZhnunuWW', 1., 0.02*f350*lumi_factor, prod='Z',
                     ('g', 0.33)]
              )
 f.addConstraint('Zhlltautau','(1+Z)*(1+Z)*(1+tau)*(1+tau)/width','Z,tau,width',1,0.0271*f350*lumi_factor)
-f.addConstraint('Zhqqtautau','(1+Z)*(1+Z)*(1+tau)*(1+tau)/width','Z,tau,width',1,0.0126*f350*lumi_factor)
-
+f.addConstraint('Zhqqtautau','(1+Z)*(1+Z)*(1+tau)*(1+tau)/width','Z,tau,width',1,0.012*f350*lumi_factor)
 
 # below: TLEP values scaled by sqrt(2)
+# note that lumi_factor is added to go back to 10 ab-1 if needed
 f.addConstraint('Whbb240','(1+W)*(1+W)*(1+b)*(1+b)/width','W,b,width',1,0.03*lumi_factor)
 f.addConstraint('Whbb350','(1+W)*(1+W)*(1+b)*(1+b)/width','W,b,width',1,0.008*lumi_factor)
 f.addChannel('Zhcc', 1., 0.017*f350*lumi_factor, prod='Z', decay='c')
@@ -86,6 +86,7 @@ f.addChannel('Zhgg', 1., 0.02*f350*lumi_factor, prod='Z', decay='g')
 f.addConstraint('ZhZZ','(1+Z)*(1+Z)*(1+Z)*(1+Z)/width','Z,width',1,0.044*f350*lumi_factor)
 f.addConstraint('Zhgammagamma','(1+Z)*(1+Z)*(1+gamma)*(1+gamma)/width','Z,gamma,width',1,0.042*f350*lumi_factor)
 f.addConstraint('Zhmumu','(1+Z)*(1+Z)*(1+mu)*(1+mu)/width','Z,mu,width',1,0.18*f350*lumi_factor)
+
 if float_width:
     f.addUniformConstraint('Zhinv','inv') ####->Means free floating
 
