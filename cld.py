@@ -69,10 +69,10 @@ f.addChannel('ZhqqWW2lep', 1., 0.0243*f350*lumi_factor, prod='Z',
                  ('b', 0.03)
              ]
              )
-f.addChannel('ZhnunuWW', 1., 0.02*f350*lumi_factor, prod='Z',
-             decay=[('W', 0.6),
-                    ('Z', 0.07),
-                    ('g', 0.33)]
+f.addChannel('ZhnunuWW', 1., 0.0174*f350*lumi_factor, prod='Z',
+             decay=[('W', 0.55),
+                    ('Z', 0.09),
+                    ('g', 0.36)]
              )
 f.addConstraint('Zhlltautau','(1+Z)*(1+Z)*(1+tau)*(1+tau)/width','Z,tau,width',1,0.0271*f350*lumi_factor)
 f.addConstraint('Zhqqtautau','(1+Z)*(1+Z)*(1+tau)*(1+tau)/width','Z,tau,width',1,0.012*f350*lumi_factor)
